@@ -14,32 +14,24 @@ env:
   - PYTHON='3.7' PKG='pip'
   - PYTHON='3.7' PKG='conda'
 
-matrix:
-  allow_failures: # not installing right in these environments because of pytables
-  - os: linux
-    env: PYTHON='3.7' PKG='pip'
-  - os: osx
-    env: PYTHON='3.7' PKG='pip'
-  fast_finish: true
-
 before_install:
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then export OS="Linux"; fi
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then export OS="MacOSX"; fi
   - wget https://repo.anaconda.com/miniconda/Miniconda3-latest-$OS-x86_64.sh -O miniconda.sh
   - bash miniconda.sh -b -p $HOME/miniconda
   - export PATH="$HOME/miniconda/bin:$PATH"
-  - conda create --name test-env python=$PYTHON --yes
+  - conda create --name test-env python=$PYTHON pytest --yes
   - source activate test-env
 
 install:
   - |
     if [ "$PKG" == "pip" ]; then 
-      pip install urbansim_templates pytest
+      pip install urbansim_templates
       pip list
     fi
   - |
     if [ "$PKG" == "conda" ]; then 
-      conda install urbansim_templates pytest --channel conda-forge --yes
+      conda install urbansim_templates --channel conda-forge --yes
       conda list
     fi
 
