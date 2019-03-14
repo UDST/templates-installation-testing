@@ -1,0 +1,55 @@
+build: false
+
+environment:
+  matrix:
+    - PYTHON: 2.7
+      PKG: pip
+    - PYTHON: 2.7
+      PKG: conda
+    - PYTHON: 3.5
+      PKG: pip
+    - PYTHON: 3.5
+      PKG: conda
+    - PYTHON: 3.6
+      PKG: pip
+    - PYTHON: 3.6
+      PKG: conda
+    - PYTHON: 3.7
+      PKG: pip
+    - PYTHON: 3.7
+      PKG: conda
+
+# Pip has fatal errors with older versions of python when running inside the powershell
+# conditional; hopefully we can find a way around this at some point
+
+matrix:
+  fast_finish: true
+  allow_failures:
+    - PYTHON: 2.7
+      PKG: pip
+    - PYTHON: 3.5
+      PKG: pip
+
+init:
+  - "ECHO %PYTHON% %PKG%"
+
+install:
+  - "set PATH=C:\\Miniconda3;C:\\Miniconda3\\Scripts;%PATH%"
+  - conda update conda --yes --quiet
+  - "conda create --name test-env python=%PYTHON% pytest pip --yes --quiet"
+  - activate test-env
+  - ps: |
+      if ($env:PKG -eq "pip")
+      {
+        pip install urbansim_templates
+        pip list
+      }
+  - ps: |
+      if ($env:PKG -eq "conda")
+      {
+        conda install urbansim_templates --channel conda-forge --yes --quiet
+        conda list
+      }
+
+test_script:
+  - py.test
